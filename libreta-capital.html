@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libreta de Capital — Santi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1f1f1f;
+    --border: #2a2a2a;
+    --accent: #c8f060;
+    --accent2: #60d4f0;
+    --warn: #f0a060;
+    --muted: #555;
+    --text: #e8e8e8;
+    --text2: #999;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(22px, 5vw, 32px);
+    letter-spacing: -0.5px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .header-left p {
+    color: var(--text2);
+    font-size: 11px;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0e0e0e;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  .btn-primary:hover { background: #b8e050; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+  }
+
+  .btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 7px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+
+  .tab.active {
+    background: var(--surface2);
+    color: var(--accent);
+    border: 1px solid var(--border);
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+
+  .card-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* SUMMARY ROW */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .summary-card.highlight { border-color: var(--accent); }
+
+  /* FORM */
+  .form-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text2);
+  }
+
+  .field-cat {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    margin-top: 14px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    grid-column: 1 / -1;
+  }
+
+  input, textarea, select {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 10px 12px;
+    width: 100%;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  input::placeholder { color: var(--muted); }
+
+  .currency-tag {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .tag-usd { background: #1a2e1a; color: #60c060; }
+  .tag-ars { background: #2a1a1a; color: #c06060; }
+  .tag-mix { background: #1a1a2a; color: #6060c0; }
+
+  /* HISTORY TABLE */
+  .history-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  th {
+    text-align: left;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text2);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #1a1a1a;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: var(--surface2); }
+
+  .positive { color: #7ecf7e; }
+  .negative { color: #cf7e7e; }
+  .neutral { color: var(--text2); }
+
+  .period-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent2);
+  }
+
+  /* CHART */
+  .chart-wrap {
+    height: 160px;
+    position: relative;
+    margin-top: 8px;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* DELTA INDICATOR */
+  .delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .delta.up { background: #1a2e1a; color: #7ecf7e; }
+  .delta.down { background: #2e1a1a; color: #cf7e7e; }
+  .delta.flat { background: var(--surface2); color: var(--text2); }
+
+  .section-divider {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 2;
+  }
+
+  .notes-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .delete-btn {
+    font-size: 10px;
+    padding: 3px 8px;
+    border: 1px solid #3a2020;
+    border-radius: 4px;
+    background: transparent;
+    color: #cf7e7e;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.15s;
+  }
+
+  .delete-btn:hover { background: #3a2020; }
+
+  .hidden { display: none !important; }
+
+  /* Breakdown bar */
+  .breakdown-bar {
+    height: 8px;
+    border-radius: 4px;
+    display: flex;
+    overflow: hidden;
+    gap: 1px;
+    margin-top: 10px;
+  }
+
+  .bar-seg { height: 100%; transition: width 0.4s ease; }
+
+  .bar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>📒 Libreta de Capital</h1>
+    <p>Seguimiento quincenal · Santi</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button class="btn btn-ghost" onclick="exportData()">↓ Exportar</button>
+    <button class="btn btn-primary" onclick="showTab('registrar')">+ Nuevo registro</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('resumen')" id="tab-resumen">Resumen</button>
+  <button class="tab" onclick="showTab('registrar')" id="tab-registrar">Registrar</button>
+  <button class="tab" onclick="showTab('historial')" id="tab-historial">Historial</button>
+</div>
+
+<!-- ===== RESUMEN ===== -->
+<div id="view-resumen">
+  <div id="no-data-msg" class="empty-state">
+    Todavía no hay registros.<br>
+    Hacé clic en <strong>+ Nuevo registro</strong> para empezar.
+  </div>
+
+  <div id="resumen-content" class="hidden">
+    <div class="summary-grid">
+      <div class="summary-card highlight">
+        <div class="card-label">Capital total (USD)</div>
+        <div class="card-value" id="total-usd">—</div>
+        <div class="card-sub" id="total-usd-delta"></div>
+      </div>
+      <div class="summary-card">
+        <div class="card-label">Liquidez inmediata</div>
+        <div class="card-value" style="font-size:20px;color:var(--accent2)" id="liq-usd">—</div>
+        <div class="card-sub">USD efectivo</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-label">Cuasi-liquidez</div>
+        <div class="card-value" style="font-size:20px;color:var(--warn)" id="renta-fija">—</div>
+        <div class="card-sub">BullMarket · 1–3 días</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-label">A liquidar</div>
+        <div class="card-value" style="font-size:20px;color:#b07ee0" id="a-liquidar">—</div>
+        <div class="card-sub">Reloj, Play, etc.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-label">Composición del capital</div>
+      <div class="breakdown-bar" id="breakdown-bar"></div>
+      <div class="bar-legend" id="bar-legend"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label" style="margin-bottom:10px">Evolución del capital total (USD)</div>
+      <div class="chart-wrap">
+        <canvas id="capitalChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="card-label">Último período — notas</div>
+      <div class="notes-box" id="last-notes" style="margin-top:10px">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REGISTRAR ===== -->
+<div id="view-registrar" class="hidden">
+  <div class="card form-section">
+    <h2>Nuevo corte de capital</h2>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Fecha</label>
+        <input type="date" id="f-fecha">
+      </div>
+      <div class="field">
+        <label>Período (ej: Q1 2026, Quincena 1 Marzo)</label>
+        <input type="text" id="f-periodo" placeholder="Quincena 1 — Marzo 2026">
+      </div>
+    </div>
+
+    <div class="section-divider">💵 Liquidez inmediata <span class="currency-tag tag-usd">USD</span></div>
+    <div class="form-grid">
+      <div class="field">
+        <label>USD en efectivo (u$s)</label>
+        <input type="number" id="f-usd-cash" placeholder="0" min="0" step="0.01">
+      </div>
+    </div>
+
+    <div class="section-divider">📈 Cuasi-liquidez <span class="currency-tag tag-mix">USD/ARS</span></div>
+    <div class="form-grid">
+      <div class="field">
+        <label>BullMarket renta fija (ARS)</label>
+        <input type="number" id="f-bullmarket-ars" placeholder="0" min="0">
+      </div>
+      <div class="field">
+        <label>Tipo de cambio USD/ARS</label>
+        <input type="number" id="f-tc" placeholder="1300" min="1">
+      </div>
+    </div>
+
+    <div class="section-divider">📦 Activos a liquidar <span class="currency-tag tag-usd">USD estimado</span></div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Reloj (USD estimado)</label>
+        <input type="number" id="f-reloj" placeholder="0" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Play Station (USD estimado)</label>
+        <input type="number" id="f-play" placeholder="0" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Otro activo (USD estimado)</label>
+        <input type="number" id="f-otro-activo" placeholder="0" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Descripción del otro activo</label>
+        <input type="text" id="f-otro-desc" placeholder="ej: Cámara, ropa, etc.">
+      </div>
+    </div>
+
+    <div class="section-divider">✂️ Capital operativo — Barbershop <span class="currency-tag tag-ars">ARS</span></div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Ingresos del período (ARS)</label>
+        <input type="number" id="f-barber-ingr" placeholder="0" min="0">
+      </div>
+      <div class="field">
+        <label>Gastos del período (ARS)</label>
+        <input type="number" id="f-barber-gast" placeholder="0" min="0">
+      </div>
+    </div>
+
+    <div class="section-divider">📝 Notas del período</div>
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="field">
+        <label>Observaciones, decisiones, contexto</label>
+        <textarea id="f-notas" rows="3" placeholder="Ej: Vendí la Play, moví ARS al fondo, dólar subió..."></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="guardarRegistro()">Guardar registro</button>
+      <button class="btn btn-ghost" onclick="showTab('resumen')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HISTORIAL ===== -->
+<div id="view-historial" class="hidden">
+  <div id="historial-empty" class="empty-state">Todavía no hay registros.</div>
+  <div id="historial-table-wrap" class="hidden">
+    <div class="history-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Fecha</th>
+            <th>USD Cash</th>
+            <th>BullMarket</th>
+            <th>A liquidar</th>
+            <th>Barbershop</th>
+            <th>Total USD</th>
+            <th>Δ vs anterior</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="historial-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ===== STATE =====
+let registros = JSON.parse(localStorage.getItem('capital_registros') || '[]');
+let chart = null;
+
+// ===== UTILS =====
+const fmt = (n, dec=2) => n == null ? '—' : '$' + Number(n).toLocaleString('es-AR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+const fmtUSD = (n) => n == null ? '—' : 'u$s ' + Number(n).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtARS = (n) => n == null ? '—' : '$' + Number(n).toLocaleString('es-AR', {minimumFractionDigits:0, maximumFractionDigits:0});
+const today = () => new Date().toISOString().split('T')[0];
+
+function calcTotal(r) {
+  const tc = r.tc || 1;
+  const usdCash = r.usdCash || 0;
+  const bullUSD = (r.bullmarketARS || 0) / tc;
+  const liquidar = (r.reloj || 0) + (r.play || 0) + (r.otroActivo || 0);
+  const barberUSD = ((r.barberIngr || 0) - (r.barberGast || 0)) / tc;
+  return { usdCash, bullUSD, liquidar, barberUSD, total: usdCash + bullUSD + liquidar + barberUSD };
+}
+
+// ===== TABS =====
+function showTab(name) {
+  ['resumen','registrar','historial'].forEach(t => {
+    document.getElementById('view-' + t).classList.add('hidden');
+    document.getElementById('tab-' + t).classList.remove('active');
+  });
+  document.getElementById('view-' + name).classList.remove('hidden');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'resumen') renderResumen();
+  if (name === 'historial') renderHistorial();
+  if (name === 'registrar') prefillForm();
+}
+
+function prefillForm() {
+  if (!document.getElementById('f-fecha').value) {
+    document.getElementById('f-fecha').value = today();
+  }
+}
+
+// ===== GUARDAR =====
+function guardarRegistro() {
+  const tc = parseFloat(document.getElementById('f-tc').value) || 1300;
+  const r = {
+    id: Date.now(),
+    fecha: document.getElementById('f-fecha').value || today(),
+    periodo: document.getElementById('f-periodo').value || 'Sin título',
+    usdCash: parseFloat(document.getElementById('f-usd-cash').value) || 0,
+    bullmarketARS: parseFloat(document.getElementById('f-bullmarket-ars').value) || 0,
+    tc,
+    reloj: parseFloat(document.getElementById('f-reloj').value) || 0,
+    play: parseFloat(document.getElementById('f-play').value) || 0,
+    otroActivo: parseFloat(document.getElementById('f-otro-activo').value) || 0,
+    otroDesc: document.getElementById('f-otro-desc').value || '',
+    barberIngr: parseFloat(document.getElementById('f-barber-ingr').value) || 0,
+    barberGast: parseFloat(document.getElementById('f-barber-gast').value) || 0,
+    notas: document.getElementById('f-notas').value || '',
+  };
+
+  registros.push(r);
+  registros.sort((a,b) => a.fecha.localeCompare(b.fecha));
+  localStorage.setItem('capital_registros', JSON.stringify(registros));
+
+  // clear form
+  ['f-fecha','f-periodo','f-usd-cash','f-bullmarket-ars','f-tc','f-reloj','f-play','f-otro-activo','f-otro-desc','f-barber-ingr','f-barber-gast','f-notas'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+
+  showTab('resumen');
+}
+
+// ===== ELIMINAR =====
+function eliminarRegistro(id) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  registros = registros.filter(r => r.id !== id);
+  localStorage.setItem('capital_registros', JSON.stringify(registros));
+  renderHistorial();
+  renderResumen();
+}
+
+// ===== RESUMEN =====
+function renderResumen() {
+  if (registros.length === 0) {
+    document.getElementById('no-data-msg').classList.remove('hidden');
+    document.getElementById('resumen-content').classList.add('hidden');
+    return;
+  }
+  document.getElementById('no-data-msg').classList.add('hidden');
+  document.getElementById('resumen-content').classList.remove('hidden');
+
+  const last = registros[registros.length - 1];
+  const prev = registros.length > 1 ? registros[registros.length - 2] : null;
+  const c = calcTotal(last);
+  const cp = prev ? calcTotal(prev) : null;
+
+  document.getElementById('total-usd').textContent = fmtUSD(c.total);
+  document.getElementById('liq-usd').textContent = fmtUSD(c.usdCash);
+  document.getElementById('renta-fija').textContent = fmtUSD(c.bullUSD);
+  document.getElementById('a-liquidar').textContent = fmtUSD(c.liquidar);
+
+  if (cp) {
+    const delta = c.total - cp.total;
+    const pct = cp.total > 0 ? (delta / cp.total * 100).toFixed(1) : 0;
+    const el = document.getElementById('total-usd-delta');
+    el.innerHTML = `<span class="delta ${delta >= 0 ? 'up' : 'down'}">${delta >= 0 ? '▲' : '▼'} u$s ${Math.abs(delta).toFixed(2)} (${pct}%)</span> vs quincena anterior`;
+  } else {
+    document.getElementById('total-usd-delta').textContent = 'Primer registro';
+  }
+
+  // Breakdown bar
+  const total = c.total || 1;
+  const segs = [
+    { val: c.usdCash, color: '#60d4f0', label: 'USD Cash' },
+    { val: c.bullUSD, color: '#f0a060', label: 'BullMarket' },
+    { val: c.liquidar, color: '#b07ee0', label: 'A liquidar' },
+    { val: Math.max(c.barberUSD, 0), color: '#c8f060', label: 'Barbershop' },
+  ];
+  const bar = document.getElementById('breakdown-bar');
+  const legend = document.getElementById('bar-legend');
+  bar.innerHTML = '';
+  legend.innerHTML = '';
+  segs.forEach(s => {
+    const pct = (s.val / total * 100).toFixed(1);
+    bar.innerHTML += `<div class="bar-seg" style="width:${pct}%;background:${s.color}"></div>`;
+    legend.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${s.color}"></div>${s.label}: ${pct}%</div>`;
+  });
+
+  // Notes
+  document.getElementById('last-notes').textContent = last.notas || '(sin notas)';
+
+  // Chart
+  renderChart();
+}
+
+function renderChart() {
+  const labels = registros.map(r => r.periodo || r.fecha);
+  const data = registros.map(r => +calcTotal(r).total.toFixed(2));
+
+  if (chart) chart.destroy();
+  const ctx = document.getElementById('capitalChart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#c8f060',
+        backgroundColor: 'rgba(200,240,96,0.07)',
+        borderWidth: 2,
+        pointBackgroundColor: '#c8f060',
+        pointRadius: 4,
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => 'u$s ' + ctx.raw.toLocaleString('es-AR', {minimumFractionDigits:2}) }
+      }},
+      scales: {
+        x: { ticks: { color: '#555', font: { family: 'DM Mono', size: 10 } }, grid: { color: '#1a1a1a' } },
+        y: { ticks: { color: '#555', font: { family: 'DM Mono', size: 10 }, callback: v => 'u$s ' + v }, grid: { color: '#1a1a1a' } }
+      }
+    }
+  });
+}
+
+// ===== HISTORIAL =====
+function renderHistorial() {
+  const empty = document.getElementById('historial-empty');
+  const wrap = document.getElementById('historial-table-wrap');
+  if (registros.length === 0) {
+    empty.classList.remove('hidden');
+    wrap.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  wrap.classList.remove('hidden');
+
+  const tbody = document.getElementById('historial-tbody');
+  tbody.innerHTML = '';
+
+  [...registros].reverse().forEach((r, i) => {
+    const idx = registros.indexOf(r);
+    const prev = idx > 0 ? registros[idx - 1] : null;
+    const c = calcTotal(r);
+    const cp = prev ? calcTotal(prev) : null;
+    const delta = cp ? (c.total - cp.total) : null;
+    const pct = cp && cp.total > 0 ? (delta / cp.total * 100).toFixed(1) : null;
+
+    let deltaCell = '<td class="neutral">—</td>';
+    if (delta !== null) {
+      const cls = delta >= 0 ? 'positive' : 'negative';
+      const sign = delta >= 0 ? '+' : '';
+      deltaCell = `<td class="${cls}">${sign}u$s ${delta.toFixed(2)}<br><span style="font-size:10px;opacity:0.7">${sign}${pct}%</span></td>`;
+    }
+
+    tbody.innerHTML += `
+      <tr>
+        <td><span class="period-badge">${r.periodo}</span></td>
+        <td style="color:var(--text2)">${r.fecha}</td>
+        <td style="color:var(--accent2)">u$s ${r.usdCash.toFixed(2)}</td>
+        <td style="color:var(--warn)">${fmtARS(r.bullmarketARS)}</td>
+        <td style="color:#b07ee0">u$s ${(c.liquidar).toFixed(2)}</td>
+        <td style="color:var(--accent)">${fmtARS(r.barberIngr - r.barberGast)}</td>
+        <td style="color:var(--accent);font-weight:500">u$s ${c.total.toFixed(2)}</td>
+        ${deltaCell}
+        <td><button class="delete-btn" onclick="eliminarRegistro(${r.id})">✕</button></td>
+      </tr>
+    `;
+  });
+}
+
+// ===== EXPORT =====
+function exportData() {
+  const data = JSON.stringify(registros, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'capital-santi-' + today() + '.json';
+  a.click();
+}
+
+// ===== INIT =====
+document.getElementById('f-fecha').value = today();
+renderResumen();
+</script>
+</body>
+</html>
